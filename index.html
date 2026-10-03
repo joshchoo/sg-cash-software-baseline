@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Singapore software roles above S$240,000 cash</title>
+<style>
+  :root { --ink:#1c1915; --muted:#5c564c; --line:#e4ddd0; --paper:#f7f3ec; --card:#fffdf8; --ok:#1f6b45; --warn:#8a5a12; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:16px/1.5 "Source Serif 4", Georgia, serif; color:var(--ink); background:var(--paper); }
+  header { padding:32px 20px 12px; max-width:980px; margin:0 auto; }
+  h1 { font-size:32px; line-height:1.2; margin:0 0 8px; letter-spacing:-0.02em; }
+  h2 { font-size:22px; margin:28px 0 10px; }
+  p, li { color:var(--ink); }
+  .sub { color:var(--muted); max-width:68ch; }
+  nav { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0; }
+  nav a { color:var(--ink); text-decoration:none; border:1px solid var(--line); background:var(--card); padding:6px 10px; border-radius:999px; font:14px/1.2 ui-sans-serif, system-ui, sans-serif; }
+  main { max-width:980px; margin:0 auto; padding:0 20px 48px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; margin:12px 0; }
+  .meta { font:13px/1.4 ui-sans-serif, system-ui, sans-serif; color:var(--muted); }
+  .pay { font:15px/1.4 ui-sans-serif, system-ui, sans-serif; font-weight:650; }
+  .tag { display:inline-block; font:12px/1.2 ui-sans-serif, system-ui, sans-serif; border:1px solid var(--line); border-radius:999px; padding:3px 8px; margin-right:6px; }
+  .ok { color:var(--ok); }
+  .warn { color:var(--warn); }
+  table { width:100%; border-collapse:collapse; font:14px/1.4 ui-sans-serif, system-ui, sans-serif; background:var(--card); }
+  th, td { border-bottom:1px solid var(--line); text-align:left; padding:8px; vertical-align:top; }
+  a { color:#1d4e89; }
+  code { font:13px/1.4 ui-monospace, monospace; }
+</style>
+</head>
+<body>
+<header>
+  <p class="meta">Baseline dataset · checked 3 Oct 2026 · cash only</p>
+  <h1>Singapore software roles whose posted cash range can exceed S$240,000</h1>
+  <p class="sub">This site lists software-engineering roles in Singapore. The employer or the job site must report a cash range. The upper bound must be above S$240,000 per year. Bonus, equity, and commission are not in the cash amount.</p>
+  <nav>
+    <a href="#jobs">Current jobs</a>
+    <a href="#archive">Archived jobs</a>
+    <a href="#companies">Watchlist</a>
+    <a href="#sources">Sources</a>
+    <a href="#method">Methodology</a>
+    <a href="#changes">Recent changes</a>
+  </nav>
+</header>
+<main>
+  <section id="jobs"><h2>Current qualifying jobs</h2><div id="job-list">Loading records…</div></section>
+  <section id="archive"><h2>Archived jobs</h2><div id="archive-list"></div></section>
+  <section id="companies"><h2>Company watchlist</h2><div id="company-list"></div></section>
+  <section id="sources"><h2>Source verification status</h2><div id="source-list"></div></section>
+  <section id="method">
+    <h2>Methodology</h2>
+    <div class="card">
+      <p>The cash test uses only the salary figure on the employer page or the job site. A monthly figure is multiplied by 12. The upper bound must be above S$240,000. A range that stops at S$240,000 does not pass.</p>
+      <p>Included work: software engineering, platform or infrastructure engineering, backend, frontend, mobile, security, reliability, distributed systems, engineering management, and internal AI or developer-platform engineering.</p>
+      <p>Excluded work: solution engineer, solutions architect, customer implementation, forward deployed engineer, and trading or HFT roles that require C++. A role is also excluded when it requires an ML-specific degree. Use of AI does not exclude a role.</p>
+      <p>MyCareersFuture Singapore is searched on every run. Official career pages are registered for the watchlist. Third-party reports stay labeled as third-party until an official page confirms them.</p>
+      <p>Accepted jobs are not deleted. A closed or unverifiable role is archived with the original URL, the salary wording, and the reason.</p>
+      <p>This run is the dataset baseline. No historical tracker records were imported.</p>
+    </div>
+  </section>
+  <section id="changes"><h2>Recent changes</h2><div id="change-list"></div></section>
+</main>
+<script>
+function money(n){ return "S$" + n.toLocaleString("en-SG"); }
+function jobCard(j){
+  return `<article class="card">
+    <div class="meta">${j.company} · ${j.location}</div>
+    <h3 style="margin:4px 0 8px">${j.title}</h3>
+    <p class="pay">${j.evidenceWording}</p>
+    <p class="pay">Annual cash: ${money(j.annualizedSalaryMin)} to ${money(j.annualizedSalaryMax)}</p>
+    <p class="meta">Calculation: monthly figures × 12. Cash only.</p>
+    <p><span class="tag">${j.matchClassification}</span><span class="tag">${j.listingStatus}</span><span class="tag">${j.employmentType}</span></p>
+    <p class="meta">Source: ${j.sourceLabel}. Evidence kind: ${j.evidenceKind}.</p>
+    <p>${j.evidenceNote}</p>
+    <p><a href="${j.sourceUrl}">Open the original listing</a></p>
+    <p class="meta">First seen ${j.firstSeenAt}. Last verified ${j.lastVerifiedAt}. ${j.archiveReason ? "Archive reason: " + j.archiveReason : ""}</p>
+  </article>`;
+}
+fetch("data.json").then(r => r.json()).then(db => {
+  const open = db.jobs.filter(j => j.listingStatus === "open");
+  const arch = db.jobs.filter(j => j.listingStatus !== "open");
+  document.getElementById("job-list").innerHTML = open.map(jobCard).join("") || "<p>No open roles.</p>";
+  document.getElementById("archive-list").innerHTML = arch.map(jobCard).join("") || "<p>No archived roles. This is the baseline.</p>";
+  document.getElementById("company-list").innerHTML = `<table><thead><tr><th>Company</th><th>Presence</th><th>Signal</th><th>Links</th></tr></thead><tbody>${
+    db.companies.map(c => `<tr><td>${c.name}</td><td>${c.presenceStatus}<br><span class="meta">${c.presenceEvidenceWording}</span></td><td><span class="tag">${c.signalSourceType}</span><br>${c.expansionSignal}</td><td><a href="${c.officialWebsite}">Site</a><br><a href="${c.careersUrl}">Careers</a><br><a href="${c.presenceEvidenceUrl}">Evidence</a></td></tr>`).join("")
+  }</tbody></table>`;
+  document.getElementById("source-list").innerHTML = `<table><thead><tr><th>Source</th><th>Status</th><th>Last check</th></tr></thead><tbody>${
+    db.sources.map(s => `<tr><td><a href="${s.url}">${s.label}</a><br><span class="meta">${s.company} · ${s.isOfficial ? "official" : "third-party"}</span></td><td>${s.sourceStatus}<br>${s.lastOutcome}</td><td>${s.lastCheckedAt}<br><span class="meta">${s.lastOutcomeNote}</span></td></tr>`).join("")
+  }</tbody></table>
+  <h3>Source checks</h3>
+  <table><thead><tr><th>When</th><th>Status</th><th>Notes</th></tr></thead><tbody>${
+    db.sourceChecks.map(c => `<tr><td>${c.checkedAt}</td><td>${c.status}<br><span class="meta">${c.httpOutcome}</span></td><td>${c.notes}</td></tr>`).join("")
+  }</tbody></table>`;
+  document.getElementById("change-list").innerHTML = db.changes.map(c => `<div class="card"><p class="meta">${c.at} · ${c.kind}</p><p>${c.text}</p></div>`).join("");
+}).catch(() => {
+  document.getElementById("job-list").innerHTML = "<p>The data file did not load.</p>";
+});
+</script>
+</body>
+</html>
